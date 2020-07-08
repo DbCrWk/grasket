@@ -33,6 +33,13 @@ class Line {
         this.intercept = intercept;
     }
 
+    equals(line: Line): boolean {
+        return (
+            this.slope === line.slope
+            && this.intercept === line.intercept
+        );
+    }
+
     hasPoint(p: Point): boolean {
         return (
             p.y === this.slope * p.x + this.intercept

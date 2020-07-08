@@ -16,6 +16,67 @@ describe('line', () => {
         });
     });
 
+    describe('.equals', () => {
+        it('returns true if slope, intercept are same', () => {
+            expect.assertions(1);
+
+            const m = 1;
+            const b = 2;
+
+            const l = new Line(m, b);
+            const r = new Line(m, b);
+
+            expect(l.equals(r)).toBe(true);
+        });
+
+        it('returns false if slope, intercept are different', () => {
+            expect.assertions(1);
+
+            const l = new Line(1, 2);
+            const r = new Line(3, 4);
+
+            expect(l.equals(r)).toBe(false);
+        });
+
+        it('returns false if slope same, intercept different', () => {
+            expect.assertions(1);
+
+            const l = new Line(1, 2);
+            const r = new Line(1, 4);
+
+            expect(l.equals(r)).toBe(false);
+        });
+
+        it('returns false if slope different, intercept same', () => {
+            expect.assertions(1);
+
+            const l = new Line(1, 2);
+            const r = new Line(2, 2);
+
+            expect(l.equals(r)).toBe(false);
+        });
+
+        it('is commutative when equal', () => {
+            expect.assertions(2);
+
+            const l = new Line(1, 2);
+            const r = new Line(1, 2);
+
+            expect(l.equals(r)).toBe(true);
+            expect(r.equals(l)).toBe(true);
+        });
+
+        it('is commutative when not equal', () => {
+            expect.assertions(2);
+
+            const l = new Line(1, 2);
+            const r = new Line(1, 3);
+
+            expect(l.equals(r)).toBe(false);
+            expect(r.equals(l)).toBe(false);
+        });
+    });
+
     describe('.byPoints', () => {
         it('throws on identical points', () => {
             expect.assertions(1);
