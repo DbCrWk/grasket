@@ -72,4 +72,30 @@ describe('point', () => {
             expect(o.equals(p)).toBe(false);
         });
     });
+
+    describe('.euclideanDistanceTo', () => {
+        it('returns 0 for the same point', () => {
+            expect.assertions(1);
+
+            const x = 1;
+            const y = 2;
+            const p = new Point(x, y);
+            const q = new Point(x, y);
+
+            expect(p.euclideanDistanceTo(q)).toStrictEqual(0);
+        });
+
+        it('returns correct value for different point', () => {
+            expect.assertions(2);
+
+            const p = new Point(0, 0);
+            const q = new Point(0, 1);
+
+            const r = new Point(2, 5);
+            const s = new Point(6, 2);
+
+            expect(p.euclideanDistanceTo(q)).toBe(1);
+            expect(r.euclideanDistanceTo(s)).toBe(5);
+        });
+    });
 });

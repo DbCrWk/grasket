@@ -16,6 +16,10 @@ class Point {
             && this.y === p.y
         );
     }
+
+    euclideanDistanceTo(p: Point): number {
+        return Math.sqrt((this.y - p.y) ** 2 + (this.x - p.x) ** 2);
+    }
 }
 
 export default Point;
