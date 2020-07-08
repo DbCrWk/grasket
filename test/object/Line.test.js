@@ -95,7 +95,7 @@ describe('line', () => {
             const l = Line.byPoints(a, b);
 
             expect(l.slope).toBe(Infinity);
-            expect(l.intercept).toBe(0);
+            expect(l.intercept).toBe(1);
         });
 
         it('creates a line', () => {
@@ -131,6 +131,27 @@ describe('line', () => {
 
             expect(l.hasPoint(c)).toBe(false);
         });
+
+        it('returns true if point on vertical line', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(1, 5);
+            const l = Line.byPoints(a, b);
+
+            expect(l.hasPoint(a)).toBe(true);
+        });
+
+        it('returns false if point not on vertical line', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(1, 5);
+            const c = new Point(2, 6);
+            const l = Line.byPoints(a, b);
+
+            expect(l.hasPoint(c)).toBe(false);
+        });
     });
 
     describe('.getPerpendicular', () => {
@@ -149,6 +170,36 @@ describe('line', () => {
             expect(r.intercept).toBe(6);
             expect(r.hasPoint(c)).toBe(true);
             expect(r.hasPoint(d)).toBe(true);
+        });
+
+        it('returns vertical line when appropriate', () => {
+            expect.assertions(3);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 3);
+            const l = Line.byPoints(a, b);
+
+            const c = new Point(0, 0);
+            const r = l.getPerpendicular(c);
+
+            expect(r.slope).toBe(Infinity);
+            expect(r.intercept).toBe(0);
+            expect(r.hasPoint(c)).toBe(true);
+        });
+
+        it('returns horizontal line when appropriate', () => {
+            expect.assertions(3);
+
+            const a = new Point(1, 3);
+            const b = new Point(1, 5);
+            const l = Line.byPoints(a, b);
+
+            const c = new Point(4, 4);
+            const r = l.getPerpendicular(c);
+
+            expect(r.slope).toBe(0);
+            expect(r.intercept).toBe(4);
+            expect(r.hasPoint(c)).toBe(true);
         });
     });
 

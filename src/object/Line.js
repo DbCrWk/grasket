@@ -16,7 +16,7 @@ class Line {
         }
 
         if (a.x === b.x) {
-            return new Line(Infinity, 0);
+            return new Line(Infinity, a.x);
         }
 
         const rise = b.y - a.y;
@@ -41,14 +41,23 @@ class Line {
     }
 
     hasPoint(p: Point): boolean {
+        if (this.slope === Infinity) {
+            return p.x === this.intercept;
+        }
+
         return (
             p.y === this.slope * p.x + this.intercept
         );
     }
 
     getPerpendicular(p: Point): Line {
-        const newSlope = (this.slope === Infinity) ? 0 : -(1 / this.slope);
-        const newIntercept = p.y - (newSlope * p.x);
+        const getNewSlope = (): number => {
+            if (this.slope === Infinity) return 0;
+            if (this.slope === 0) return Infinity;
+            return -(1 / this.slope);
+        };
+        const newSlope = getNewSlope();
+        const newIntercept = newSlope === Infinity ? p.x : p.y - (newSlope * p.x);
 
         return new Line(newSlope, newIntercept);
     }
