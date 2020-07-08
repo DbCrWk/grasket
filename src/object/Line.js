@@ -52,6 +52,22 @@ class Line {
 
         return new Line(newSlope, newIntercept);
     }
+
+    getLineIntersectionPoint(line: Line): Point {
+        // If the lines are the same, then they do not have a unique intersection point
+        if (this.equals(line)) return new Point(0, 0);
+
+        // If the lines are parallel, but not the same, then they do not have an intersection point
+        if (this.slope === line.slope) {
+            throw error('.getLineIntersectionPoint', 'Lines are parallel, but not equal and do not have an intersection point', { l: this, r: line });
+        }
+
+        // The difference in slope is well-defined and this computation is valid
+        const x = (line.intercept - this.intercept) / (this.slope - line.slope);
+        const y = this.slope * x + this.intercept;
+
+        return new Point(x, y);
+    }
 }
 
 export default Line;

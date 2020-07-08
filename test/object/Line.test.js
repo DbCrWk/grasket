@@ -151,4 +151,47 @@ describe('line', () => {
             expect(r.hasPoint(d)).toBe(true);
         });
     });
+
+    describe('.getLineIntersectionPoint', () => {
+        it('returns correct intersection pint', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const l = Line.byPoints(a, b);
+
+            const c = new Point(4, 4);
+            const r = l.getPerpendicular(c);
+
+            const p = l.getLineIntersectionPoint(r);
+            const i = new Point(2, 5);
+            expect(p.equals(i)).toBe(true);
+        });
+
+        it('return origin when lines are the same', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const l = Line.byPoints(a, b);
+
+            const p = l.getLineIntersectionPoint(l);
+            const i = new Point(0, 0);
+            expect(p.equals(i)).toBe(true);
+        });
+
+        it('throws when lines are parallel', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const l = Line.byPoints(a, b);
+
+            const c = new Point(1, 4);
+            const d = new Point(2, 6);
+            const r = Line.byPoints(c, d);
+
+            expect(() => l.getLineIntersectionPoint(r)).toThrow('Lines are parallel, but not equal and do not have an intersection point');
+        });
+    });
 });
