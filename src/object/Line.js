@@ -45,6 +45,13 @@ class Line {
             p.y === this.slope * p.x + this.intercept
         );
     }
+
+    getPerpendicular(p: Point): Line {
+        const newSlope = (this.slope === Infinity) ? 0 : -(1 / this.slope);
+        const newIntercept = p.y - (newSlope * p.x);
+
+        return new Line(newSlope, newIntercept);
+    }
 }
 
 export default Line;

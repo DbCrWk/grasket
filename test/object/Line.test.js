@@ -132,4 +132,23 @@ describe('line', () => {
             expect(l.hasPoint(c)).toBe(false);
         });
     });
+
+    describe('.getPerpendicular', () => {
+        it('returns correct perpendicular line', () => {
+            expect.assertions(4);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const l = Line.byPoints(a, b);
+
+            const c = new Point(4, 4);
+            const d = new Point(6, 3);
+            const r = l.getPerpendicular(c);
+
+            expect(r.slope).toBe(-1 / 2);
+            expect(r.intercept).toBe(6);
+            expect(r.hasPoint(c)).toBe(true);
+            expect(r.hasPoint(d)).toBe(true);
+        });
+    });
 });
