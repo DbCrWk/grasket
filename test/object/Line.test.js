@@ -48,4 +48,27 @@ describe('line', () => {
             expect(l.intercept).toBe(1);
         });
     });
+
+    describe('.hasPoint', () => {
+        it('returns true if point on line', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const l = Line.byPoints(a, b);
+
+            expect(l.hasPoint(a)).toBe(true);
+        });
+
+        it('returns false if point not on line', () => {
+            expect.assertions(1);
+
+            const a = new Point(1, 3);
+            const b = new Point(2, 5);
+            const c = new Point(2, 6);
+            const l = Line.byPoints(a, b);
+
+            expect(l.hasPoint(c)).toBe(false);
+        });
+    });
 });

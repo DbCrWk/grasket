@@ -32,6 +32,12 @@ class Line {
         this.slope = slope;
         this.intercept = intercept;
     }
+
+    hasPoint(p: Point): boolean {
+        return (
+            p.y === this.slope * p.x + this.intercept
+        );
+    }
 }
 
 export default Line;
