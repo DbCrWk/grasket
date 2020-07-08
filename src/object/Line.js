@@ -1,6 +1,7 @@
 // @flow
 import { errorLib as errorGn } from '../util/logger';
 import Point from './Point';
+import Circle from './Circle';
 
 const namespace = 'Object > Line';
 const error = errorGn(namespace);
@@ -76,6 +77,15 @@ class Line {
         const y = this.slope * x + this.intercept;
 
         return new Point(x, y);
+    }
+
+    getClosestPoint(p: Point): Point {
+        const r = this.getPerpendicular(p);
+        return this.getLineIntersectionPoint(r);
+    }
+
+    getCircleClosestPoint(circle: Circle): Point {
+        return this.getClosestPoint(circle.center);
     }
 }
 

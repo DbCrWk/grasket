@@ -1,6 +1,7 @@
 // @flow
 import Line from '../../src/object/Line';
 import Point from '../../src/object/Point';
+import Circle from '../../src/object/Circle';
 
 describe('line', () => {
     describe('()', () => {
@@ -243,6 +244,34 @@ describe('line', () => {
             const r = Line.byPoints(c, d);
 
             expect(() => l.getLineIntersectionPoint(r)).toThrow('Lines are parallel, but not equal and do not have an intersection point');
+        });
+    });
+
+    describe('.getClosestPoint', () => {
+        it('returns the closest point to circle', () => {
+            expect.assertions(1);
+
+            const l = new Line(1, 0);
+            const c = new Point(4, 2);
+
+            const p = l.getClosestPoint(c);
+            const q = new Point(3, 3);
+
+            expect(p.equals(q)).toBe(true);
+        });
+    });
+
+    describe('.getCircleClosestPoint', () => {
+        it('returns the closest point to circle', () => {
+            expect.assertions(1);
+
+            const l = new Line(1, 0);
+            const c = new Circle(new Point(4, 2), 1);
+
+            const p = l.getCircleClosestPoint(c);
+            const q = new Point(3, 3);
+
+            expect(p.equals(q)).toBe(true);
         });
     });
 });
