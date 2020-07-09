@@ -2,6 +2,7 @@
 import { errorLib as errorGn } from '../util/logger';
 import Point from './Point';
 import Circle from './Circle';
+import areFloatsEqual from '../util/areFloatsEqual';
 
 const namespace = 'Object > Line';
 const error = errorGn(namespace);
@@ -10,6 +11,8 @@ class Line {
     slope: number;
 
     intercept: number;
+
+    areFloatsEqual: (number, number) => boolean;
 
     static byPoints(a: Point, b: Point): Line {
         if (a.equals(b)) {
@@ -32,29 +35,30 @@ class Line {
     constructor(slope: number, intercept: number) {
         this.slope = slope;
         this.intercept = intercept;
+        this.areFloatsEqual = areFloatsEqual(0.001);
     }
 
     equals(line: Line): boolean {
         return (
-            this.slope === line.slope
-            && this.intercept === line.intercept
+            this.areFloatsEqual(this.slope, line.slope)
+            && this.areFloatsEqual(this.intercept, line.intercept)
         );
     }
 
     hasPoint(p: Point): boolean {
         if (this.slope === Infinity) {
-            return p.x === this.intercept;
+            return this.areFloatsEqual(p.x, this.intercept);
         }
 
         return (
-            p.y === this.slope * p.x + this.intercept
+            this.areFloatsEqual(p.y, this.slope * p.x + this.intercept)
         );
     }
 
     getPerpendicular(p: Point): Line {
         const getNewSlope = (): number => {
             if (this.slope === Infinity) return 0;
-            if (this.slope === 0) return Infinity;
+            if (this.areFloatsEqual(this.slope, 0)) return Infinity;
             return -(1 / this.slope);
         };
         const newSlope = getNewSlope();
@@ -68,7 +72,7 @@ class Line {
         if (this.equals(line)) return new Point(0, 0);
 
         // If the lines are parallel, but not the same, then they do not have an intersection point
-        if (this.slope === line.slope) {
+        if (this.areFloatsEqual(this.slope, line.slope)) {
             throw error('.getLineIntersectionPoint', 'Lines are parallel, but not equal and do not have an intersection point', { l: this, r: line });
         }
 
@@ -128,7 +132,7 @@ class Line {
             return [];
         }
 
-        if (lengthFromClosestPoint === circle.radius) {
+        if (this.areFloatsEqual(lengthFromClosestPoint, circle.radius)) {
             return [closestPoint];
         }
 

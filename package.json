@@ -76,7 +76,8 @@
             "src/**/*.{js,jsx}"
         ],
         "collectCoverage": true,
-        "testEnvironment": "node"
+        "testEnvironment": "node",
+        "verbose": true
     },
     "husky": {
         "hooks": {

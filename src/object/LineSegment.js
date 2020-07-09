@@ -28,13 +28,27 @@ class LineSegment {
         }
 
         this.line = line;
-        this.start = (start.x <= end.x) ? start : end;
-        this.end = (start.x <= end.x) ? end : start;
+
+        if (line.slope === Infinity) {
+            this.start = (start.y <= end.y) ? start : end;
+            this.end = (start.y <= end.y) ? end : start;
+        } else {
+            this.start = (start.x <= end.x) ? start : end;
+            this.end = (start.x <= end.x) ? end : start;
+        }
 
         (this: any).hasPoint = this.hasPoint.bind(this);
     }
 
     hasPoint(p: Point): boolean {
+        if (this.line.slope === Infinity) {
+            return (
+                this.line.hasPoint(p)
+                && p.y >= this.start.y
+                && p.y <= this.end.y
+            );
+        }
+
         return (
             this.line.hasPoint(p)
             && p.x >= this.start.x
@@ -43,7 +57,13 @@ class LineSegment {
     }
 
     getCircleIntersectionPoints(circle: Circle): Array<Point> {
-        return this.line.getCircleIntersectionPoints(circle).filter(this.hasPoint);
+        const endPointsAsIntersection = [this.start, this.end].filter(circle.hasPoint.bind(circle));
+        return [
+            ...endPointsAsIntersection,
+            ...this.line.getCircleIntersectionPoints(circle)
+                .filter(this.hasPoint)
+                .filter(p => !p.equals(this.start) && !p.equals(this.end)),
+        ];
     }
 }
 

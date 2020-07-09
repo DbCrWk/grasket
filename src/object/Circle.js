@@ -11,6 +11,11 @@ class Circle {
         this.center = center;
         this.radius = radius;
     }
+
+    hasPoint(p: Point): boolean {
+        const distanceFromRadius = this.center.euclideanDistanceTo(p);
+        return distanceFromRadius <= this.radius;
+    }
 }
 
 export default Circle;
