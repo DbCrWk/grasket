@@ -72,8 +72,40 @@ class Line {
             throw error('.getLineIntersectionPoint', 'Lines are parallel, but not equal and do not have an intersection point', { l: this, r: line });
         }
 
+        // If this line is vertical, then the intersection is simple; we also
+        // know that both lines cannot be vertical because this condition has
+        // already been checked
+        if (this.slope === Infinity) {
+            const x = this.intercept;
+            const y = line.slope * x + line.intercept;
+
+            return new Point(x, y);
+        }
+
+        // Same case above, but flipped
+        if (line.slope === Infinity) {
+            const x = line.intercept;
+            const y = this.slope * x + this.intercept;
+
+            return new Point(x, y);
+        }
+
         // The difference in slope is well-defined and this computation is valid
         const x = (line.intercept - this.intercept) / (this.slope - line.slope);
+        const y = this.slope * x + this.intercept;
+
+        return new Point(x, y);
+    }
+
+    getEndPointByTravel(start: Point, travel: number): Point {
+        if (!this.hasPoint(start)) {
+            throw error('.getEndPointByTravel', 'Start point not on line', { l: this, start, travel });
+        }
+
+        if (this.slope === Infinity) return new Point(this.intercept, start.y + travel);
+
+        const xTravel = travel / (Math.sqrt(1 + this.slope ** 2));
+        const x = start.x + xTravel;
         const y = this.slope * x + this.intercept;
 
         return new Point(x, y);
@@ -86,6 +118,22 @@ class Line {
 
     getCircleClosestPoint(circle: Circle): Point {
         return this.getClosestPoint(circle.center);
+    }
+
+    getCircleIntersectionPoints(circle: Circle): Array<Point> {
+        const closestPoint = this.getCircleClosestPoint(circle);
+        const lengthFromClosestPoint = closestPoint.euclideanDistanceTo(circle.center);
+
+        if (lengthFromClosestPoint > circle.radius) {
+            return [];
+        }
+
+        if (lengthFromClosestPoint === circle.radius) {
+            return [closestPoint];
+        }
+
+        const travel = Math.sqrt(circle.radius ** 2 - lengthFromClosestPoint ** 2);
+        return [-travel, travel].map(t => this.getEndPointByTravel(closestPoint, t));
     }
 }
 

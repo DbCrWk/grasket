@@ -2,6 +2,7 @@
 import { errorLib as errorGn } from '../util/logger';
 import Line from './Line';
 import Point from './Point';
+import Circle from './Circle';
 
 const namespace = 'Object > LineSegment';
 const error = errorGn(namespace);
@@ -27,8 +28,22 @@ class LineSegment {
         }
 
         this.line = line;
-        this.start = start;
-        this.end = end;
+        this.start = (start.x <= end.x) ? start : end;
+        this.end = (start.x <= end.x) ? end : start;
+
+        (this: any).hasPoint = this.hasPoint.bind(this);
+    }
+
+    hasPoint(p: Point): boolean {
+        return (
+            this.line.hasPoint(p)
+            && p.x >= this.start.x
+            && p.x <= this.end.x
+        );
+    }
+
+    getCircleIntersectionPoints(circle: Circle): Array<Point> {
+        return this.line.getCircleIntersectionPoints(circle).filter(this.hasPoint);
     }
 }
 
