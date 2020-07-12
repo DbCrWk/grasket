@@ -16,6 +16,9 @@ tool/flow-def
 
 [options]
 include_warnings=true
+module.name_mapper='^#src\/\(.*\)$' -> '<PROJECT_ROOT>/src/\1'
+module.name_mapper='^#test\/\(.*\)$' -> '<PROJECT_ROOT>/test/\1'
+module.name_mapper='^#tool\/\(.*\)$' -> '<PROJECT_ROOT>/tool/\1'
 
 [strict]
 

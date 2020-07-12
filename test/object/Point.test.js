@@ -1,5 +1,5 @@
 // @flow
-import Point from '../../src/object/Point';
+import Point from '#src/object/Point';
 
 describe('point', () => {
     describe('()', () => {

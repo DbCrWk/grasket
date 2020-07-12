@@ -1,6 +1,6 @@
 // @flow
-import Point from '../object/Point';
-import Circle from '../object/Circle';
+import Point from '#src/object/Point';
+import Circle from '#src/object/Circle';
 
 class Player {
     name: string;
@@ -20,6 +20,15 @@ class Player {
 
         this.center = center;
         this.occlusionField = new Circle(center, occlusionRadius);
+    }
+
+    equals(p: Player): boolean {
+        return (
+            this.center.equals(p.center)
+            && this.occlusionField.equals(p.occlusionField)
+            && this.name === p.name
+            && this.team === p.team
+        );
     }
 }
 

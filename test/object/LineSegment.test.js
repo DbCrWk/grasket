@@ -1,8 +1,8 @@
 // @flow
-import Line from '../../src/object/Line';
-import LineSegment from '../../src/object/LineSegment';
-import Point from '../../src/object/Point';
-import Circle from '../../src/object/Circle';
+import Line from '#src/object/Line';
+import LineSegment from '#src/object/LineSegment';
+import Point from '#src/object/Point';
+import Circle from '#src/object/Circle';
 
 describe('line', () => {
     describe('()', () => {

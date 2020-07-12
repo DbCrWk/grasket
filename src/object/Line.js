@@ -1,18 +1,19 @@
 // @flow
-import { errorLib as errorGn } from '../util/logger';
-import Point from './Point';
-import Circle from './Circle';
-import areFloatsEqual from '../util/areFloatsEqual';
+import { errorLib as errorGn } from '#src/util/logger';
+import { Tolerance } from '#src/standard/tolerance';
+import Point from '#src/object/Point';
+import Circle from '#src/object/Circle';
+import within from '#src/util/within';
 
 const namespace = 'Object > Line';
 const error = errorGn(namespace);
+
+const { areFloatsEqual } = within(Tolerance);
 
 class Line {
     slope: number;
 
     intercept: number;
-
-    areFloatsEqual: (number, number) => boolean;
 
     static byPoints(a: Point, b: Point): Line {
         if (a.equals(b)) {
@@ -35,30 +36,29 @@ class Line {
     constructor(slope: number, intercept: number) {
         this.slope = slope;
         this.intercept = intercept;
-        this.areFloatsEqual = areFloatsEqual(0.001);
     }
 
     equals(line: Line): boolean {
         return (
-            this.areFloatsEqual(this.slope, line.slope)
-            && this.areFloatsEqual(this.intercept, line.intercept)
+            areFloatsEqual(this.slope, line.slope)
+            && areFloatsEqual(this.intercept, line.intercept)
         );
     }
 
     hasPoint(p: Point): boolean {
         if (this.slope === Infinity) {
-            return this.areFloatsEqual(p.x, this.intercept);
+            return areFloatsEqual(p.x, this.intercept);
         }
 
         return (
-            this.areFloatsEqual(p.y, this.slope * p.x + this.intercept)
+            areFloatsEqual(p.y, this.slope * p.x + this.intercept)
         );
     }
 
     getPerpendicular(p: Point): Line {
         const getNewSlope = (): number => {
             if (this.slope === Infinity) return 0;
-            if (this.areFloatsEqual(this.slope, 0)) return Infinity;
+            if (areFloatsEqual(this.slope, 0)) return Infinity;
             return -(1 / this.slope);
         };
         const newSlope = getNewSlope();
@@ -72,7 +72,7 @@ class Line {
         if (this.equals(line)) return new Point(0, 0);
 
         // If the lines are parallel, but not the same, then they do not have an intersection point
-        if (this.areFloatsEqual(this.slope, line.slope)) {
+        if (areFloatsEqual(this.slope, line.slope)) {
             throw error('.getLineIntersectionPoint', 'Lines are parallel, but not equal and do not have an intersection point', { l: this, r: line });
         }
 
@@ -132,7 +132,7 @@ class Line {
             return [];
         }
 
-        if (this.areFloatsEqual(lengthFromClosestPoint, circle.radius)) {
+        if (areFloatsEqual(lengthFromClosestPoint, circle.radius)) {
             return [closestPoint];
         }
 

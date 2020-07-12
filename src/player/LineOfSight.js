@@ -1,7 +1,7 @@
 // @flow
-import Player from './Player';
-import LineSegment from '../object/LineSegment';
-import Line from '../object/Line';
+import Player from '#src/player/Player';
+import LineSegment from '#src/object/LineSegment';
+import Line from '#src/object/Line';
 
 class LineOfSight {
     from: Player;

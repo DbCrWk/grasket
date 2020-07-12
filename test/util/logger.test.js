@@ -5,7 +5,7 @@ import {
     errorLib as errorLibGn,
     debugLib as debugLibGn,
     json,
-} from '../../src/util/logger';
+} from '#src/util/logger';
 
 describe('logger', () => {
     it('has well-defined exports', () => {

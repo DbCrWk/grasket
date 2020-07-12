@@ -29,9 +29,22 @@
                 "annotationStyle": "line"
             }
         ],
-        "jest/prefer-inline-snapshots": "off"
+        "jest/prefer-inline-snapshots": "off",
+        "no-restricted-imports": [
+            "error",
+            {
+                "patterns": [
+                    "../*"
+                ]
+            }
+        ]
     },
     "env": {
         "jest": true
+    },
+    "settings": {
+        "import/resolver": {
+            "babel-module": {}
+        }
     }
 }

@@ -1,6 +1,5 @@
 // @flow
-
-import Point from './Point';
+import Point from '#src/object/Point';
 
 class Circle {
     center: Point;
@@ -15,6 +14,13 @@ class Circle {
     hasPoint(p: Point): boolean {
         const distanceFromRadius = this.center.euclideanDistanceTo(p);
         return distanceFromRadius <= this.radius;
+    }
+
+    equals(c: Circle): boolean {
+        return (
+            this.center.equals(c.center)
+            && this.radius === c.radius
+        );
     }
 }
 

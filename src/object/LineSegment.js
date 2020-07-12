@@ -1,8 +1,8 @@
 // @flow
-import { errorLib as errorGn } from '../util/logger';
-import Line from './Line';
-import Point from './Point';
-import Circle from './Circle';
+import { errorLib as errorGn } from '#src/util/logger';
+import Line from '#src/object/Line';
+import Point from '#src/object/Point';
+import Circle from '#src/object/Circle';
 
 const namespace = 'Object > LineSegment';
 const error = errorGn(namespace);

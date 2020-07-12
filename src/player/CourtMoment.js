@@ -1,6 +1,6 @@
 // @flow
-import Player from './Player';
-import LineOfSight from './LineOfSight';
+import Player from '#src/player/Player';
+import LineOfSight from '#src/player/LineOfSight';
 
 class CourtMoment {
     time: number;

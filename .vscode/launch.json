@@ -13,6 +13,16 @@
             "runtimeArgs": [
                 "--nolazy"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Analyze > parseGame",
+            "program": "${workspaceFolder}/src/analyze/parseGame.js",
+            "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/babel-node",
+            "runtimeArgs": [
+                "--nolazy"
+            ]
         }
     ]
 }

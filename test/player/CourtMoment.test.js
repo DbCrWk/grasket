@@ -1,7 +1,7 @@
 // @flow
-import CourtMoment from '../../src/player/CourtMoment';
-import Player from '../../src/player/Player';
-import Point from '../../src/object/Point';
+import CourtMoment from '#src/player/CourtMoment';
+import Player from '#src/player/Player';
+import Point from '#src/object/Point';
 
 describe('courtMoment', () => {
     describe('()', () => {
