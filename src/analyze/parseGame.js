@@ -2,7 +2,10 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
-import { error as errorGn, debug as debugGn } from '#src/util/logger';
+import { off } from 'process';
+import {
+    error as errorGn, debug as debugGn, json, raw,
+} from '#src/util/logger';
 import Player from '#src/player/Player';
 import Point from '#src/object/Point';
 import CourtMoment from '#src/player/CourtMoment';
@@ -23,7 +26,7 @@ const YIndex = 7;
 const TeamHeading = '"TEAM"';
 
 const playerListByTeamByTime = [];
-const courtMomentListByTime = [];
+const graphByTime = [];
 let currentGameClockAsString = null;
 let playerListByTeam = {};
 
@@ -61,10 +64,31 @@ readInterface.on('line', line => {
             debug('Constructing net', { currentGameClockAsString });
             const net = (new CourtMoment(12, offense, defense)).getOcclusionNetwork();
             debug('Net created', { currentGameClockAsString });
-            courtMomentListByTime.push(net);
+
+            const links = net.map((ll, i) => ll.map((l, j) => ({ source: offense[i].name, target: offense[j].name, value: l ? 1 : 0 }))).reduce((a, b) => [...a, ...b], []);
+
+            graphByTime.push({
+                nodes: [
+                    ...offense.map((p: Player) => ({
+                        fx: p.center.x,
+                        fy: p.center.y,
+                        r: p.occlusionField.radius,
+                        name: p.name,
+                        team: p.team,
+                    })),
+                    ...defense.map((p: Player) => ({
+                        fx: p.center.x,
+                        fy: p.center.y,
+                        r: p.occlusionField.radius,
+                        name: p.name,
+                        team: p.team,
+                    })),
+                ],
+                links,
+            });
             playerListByTeamByTime.push(playerListByTeam);
         } catch (e) {
-            error(e);
+            // error(e);
         }
 
         currentGameClockAsString = timeAsString;
@@ -86,5 +110,6 @@ readInterface.on('line', line => {
 });
 
 readInterface.on('close', () => {
-    debug('Done', { courtMomentListByTime });
+    debug('Done', { length: graphByTime.length });
+    raw(json()(graphByTime));
 });
