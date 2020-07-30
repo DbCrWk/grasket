@@ -1,6 +1,7 @@
 // @flow
 import * as d3 from 'd3';
 import data from '#src/viz/data.json';
+import '#src/viz/basketball-court.png';
 
 console.log('data', data);
 
@@ -36,7 +37,7 @@ function render(i) {
         .selectAll('circle')
         .data(dataToRender.nodes)
         .join('circle')
-        .attr('stroke', d => (d.team === '1410' ? 'green' : 'red'))
+        .attr('stroke', d => (d.hasBall ? 'orange' : (d.team === '1410' ? 'green' : 'red')))
         .attr('stroke-width', 0.5)
         .attr('fill-opacity', 0)
         .attr('r', d => (d.team === '1410' ? d.r : 0.5));
