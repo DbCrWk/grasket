@@ -1,33 +1,35 @@
 // @flow
-import Player from '#src/player/Player';
+import Point from '#src/object/Point';
 import LineSegment from '#src/object/LineSegment';
 import Line from '#src/object/Line';
+import Circle from '#src/object/Circle';
 
 class LineOfSight {
-    from: Player;
+    from: Point;
 
-    to: Player;
+    to: Point;
 
     segment: LineSegment;
 
-    constructor(from: Player, to: Player) {
+    constructor(from: Point, to: Point) {
         this.from = from;
         this.to = to;
 
-        const line = Line.byPoints(from.center, to.center);
-        this.segment = new LineSegment(line, from.center, to.center);
+        const line = Line.byPoints(from, to);
+        this.segment = new LineSegment(line, from, to);
 
-        (this: any).doesPlayerOcclude = this.doesPlayerOcclude.bind(this);
-        (this: any).doesPlayerOcclude = this.doesPlayerOcclude.bind(this);
+        (this: any).doesPointOcclude = this.doesPointOcclude.bind(this);
     }
 
-    doesPlayerOcclude(p: Player): boolean {
-        const occlusionIntersection = this.segment.getCircleIntersectionPoints(p.occlusionField);
+    doesPointOcclude(p: Point): boolean {
+        const occlusionField = new Circle(p, 3);
+
+        const occlusionIntersection = this.segment.getCircleIntersectionPoints(occlusionField);
         return (occlusionIntersection.length > 0);
     }
 
-    doPlayersOcclude(opposingPlayers: Array<Player>): boolean {
-        return opposingPlayers.some(this.doesPlayerOcclude);
+    doPointsOcclude(occludingPoints: Array<Point>): boolean {
+        return occludingPoints.some(this.doesPointOcclude);
     }
 }
 

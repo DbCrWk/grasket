@@ -1,45 +1,30 @@
 // @flow
-import { errorLib as errorGn } from '#src/util/logger';
-import Player from '#src/player/Player';
+// import { errorLib as errorGn } from '#src/util/logger';
+import PlayerMoment from '#src/player/PlayerMoment';
 import LineOfSight from '#src/player/LineOfSight';
 import areMatricesEqual from '#src/util/areMatricesEqual';
 import permuteMatrix from '#src/util/permuteMatrix';
+import permutationBuilder from '#src/util/permutationBuilder';
+import fixpointPermutationBuilder from '#src/util/fixpointPermutationBuilder';
 
-const namespace = 'Player > CourtMoment';
-const error = errorGn(namespace);
-
-type PermutationType = Array<number>;
-function permutationBuilderHelper(
-    currentPermutations: Array<PermutationType>,
-    limit: number,
-    depth: number,
-) {
-    if (depth === limit) return currentPermutations;
-
-    const updatedPermutations = currentPermutations
-        .map(
-            p => {
-                const next: Array<number> = (new Array(limit))
-                    .fill(0)
-                    .reduce((prev, curr, i) => (p.includes(i) ? prev : [...prev, i]), []);
-                return next.map(n => [...p, n]);
-            },
-        ).reduce((a, b) => [...a, ...b], []);
-    return permutationBuilderHelper(updatedPermutations, limit, depth + 1);
-}
-const permutations5: Array<PermutationType> = permutationBuilderHelper([[]], 5, 0);
-const permutations4: Array<PermutationType> = permutationBuilderHelper([[]], 4, 0);
+// const namespace = 'Player > CourtMoment';
+// const error = errorGn(namespace);
 
 class CourtMoment {
     time: number;
 
-    offense: Array<Player>;
+    offense: Array<PlayerMoment>;
 
-    defense: Array<Player>;
+    defense: Array<PlayerMoment>;
 
-    ball: ?Player;
+    ball: PlayerMoment;
 
-    constructor(time: number, offense: Array<Player>, defense: Array<Player>, ball: ?Player) {
+    constructor(
+        time: number,
+        offense: Array<PlayerMoment>,
+        defense: Array<PlayerMoment>,
+        ball: PlayerMoment,
+    ) {
         this.time = time;
         this.offense = offense;
         this.defense = defense;
@@ -47,9 +32,15 @@ class CourtMoment {
     }
 
     getOcclusionNetwork(): Array<Array<boolean>> {
+        const defensePoints = this.defense.map(d => d.center);
+
         const occlusionNetwork = this.offense.map(
             o => this.offense.map(
-                p => ((o === p) ? true : !(new LineOfSight(o, p)).doPlayersOcclude(this.defense)),
+                p => (
+                    o.equals(p)
+                        ? true
+                        : !(new LineOfSight(o.center, p.center)).doPointsOcclude(defensePoints)
+                ),
             ),
         );
         return occlusionNetwork;
@@ -59,71 +50,39 @@ class CourtMoment {
         const thisOcclusionNetwork = this.getOcclusionNetwork();
         const otherOcclusionNetwork = otherCourtMoment.getOcclusionNetwork();
 
-        const thisBall = this.ball;
-        const otherBall = otherCourtMoment.ball;
+        // const thisPlayerIndexWithBall = this.getPlayerIndexWithBall();
+        // const otherPlayerIndexWithBall = otherCourtMoment.getPlayerIndexWithBall();
+        // const permutations = permutationBuilder(4);
+        // const permutationFixer = fixpointPermutationBuilder(
+        //     thisPlayerIndexWithBall,
+        //     otherPlayerIndexWithBall,
+        // );
+        // const fixedPermutations = permutations.map(permutationFixer);
+        const fixedPermutations = permutationBuilder(5);
 
-        if (thisBall && !otherBall) return false;
-        if (!thisBall && otherBall) return false;
+        const permutedMatrices = fixedPermutations.map(p => permuteMatrix(thisOcclusionNetwork, p));
 
-        if (thisBall) {
-            const thisPlayerWithBall = this.getPlayerWithBall();
-            const otherPlayerWithBall = otherCourtMoment.getPlayerWithBall();
+        const ret = permutedMatrices.some(m => areMatricesEqual(m, otherOcclusionNetwork));
 
-            if (!thisPlayerWithBall || !otherPlayerWithBall) {
-                throw error('.isIsomorphicTo', 'Plays each have a ball, but no player with ball', {
-                    this: this,
-                    otherCourtMoment,
-                    thisBall,
-                    otherBall,
-                    thisPlayerWithBall,
-                    otherPlayerWithBall,
-                });
-            }
-
-            if (thisPlayerWithBall.name !== otherPlayerWithBall.name) return false;
-
-            let isIsomorphic = false;
-            // eslint-disable-next-line no-restricted-syntax
-            for (const permutation of permutations5) {
-                if (
-                    areMatricesEqual(
-                        permuteMatrix(thisOcclusionNetwork, permutation),
-                        permuteMatrix(otherOcclusionNetwork, permutation),
-                    )
-                ) {
-                    isIsomorphic = true;
-                    break;
-                }
-            }
-
-            return isIsomorphic;
-        }
-
-        let isIsomorphic = false;
-        // eslint-disable-next-line no-restricted-syntax
-        for (const permutation of permutations5) {
-            if (
-                areMatricesEqual(
-                    permuteMatrix(thisOcclusionNetwork, permutation),
-                    permuteMatrix(otherOcclusionNetwork, permutation),
-                )
-            ) {
-                isIsomorphic = true;
-                break;
-            }
-        }
-
-        return isIsomorphic;
+        return ret;
     }
 
-    getPlayerWithBall(): ?Player {
+    getPlayerWithBall(): PlayerMoment {
         const { ball } = this;
-        if (!ball) return null;
 
         const distances = this.offense.map(o => o.center.euclideanDistanceTo(ball.center));
         const minIndex = distances.reduce((prev, curr, i, arr) => (curr < arr[prev] ? i : prev), 0);
 
         return this.offense[minIndex];
+    }
+
+    getPlayerIndexWithBall(): number {
+        const { ball } = this;
+
+        const distances = this.offense.map(o => o.center.euclideanDistanceTo(ball.center));
+        const minIndex = distances.reduce((prev, curr, i, arr) => (curr < arr[prev] ? i : prev), 0);
+
+        return minIndex;
     }
 }
 

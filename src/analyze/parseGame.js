@@ -31,7 +31,12 @@ let currentTimeAsString = null;
 let playerListByTeam = {};
 
 const libraryOfIsomorphisms: {
-    [number]: {| moment: CourtMoment, currentPlayer: ?Player, count: number |},
+    [number]: {|
+        moment: CourtMoment,
+        currentPlayer: ?Player,
+        count: number,
+        graph: {},
+    |},
 } = {};
 
 readInterface.on('line', line => {
@@ -57,13 +62,14 @@ readInterface.on('line', line => {
         gameClockAsString,
         playerId,
         teamId,
+        speed,
+        offDefStatus,
     ] = parts;
 
     if (currentTimeAsString !== timeAsString) {
         debug('Cleaning Up', { currentTimeAsString });
-        const offense = playerListByTeam[1388];
-        const defense = playerListByTeam[1410];
-        const ball = playerListByTeam[-1] ? playerListByTeam[-1][0] : null;
+        const { offense, defense } = playerListByTeam;
+        const ball = playerListByTeam.ball ? playerListByTeam.ball[0] : null;
         try {
             debug('Constructing net', { currentTimeAsString });
             const moment = new CourtMoment(timeAsString, offense, defense, ball);
@@ -91,6 +97,7 @@ readInterface.on('line', line => {
                         r: p.occlusionField.radius,
                         name: p.name,
                         team: p.team,
+                        isOffense: true,
                         hasBall: playerWithBall && p.name === playerWithBall.name,
                     })),
                     ...defense.map((p: Player) => ({
@@ -99,6 +106,7 @@ readInterface.on('line', line => {
                         r: p.occlusionField.radius,
                         name: p.name,
                         team: p.team,
+                        isOffense: false,
                     })),
                 ],
                 links,
@@ -117,9 +125,16 @@ readInterface.on('line', line => {
     const x = parseFloat(xAsString);
     const y = parseFloat(yAsString);
 
-    if (!playerListByTeam[teamId]) playerListByTeam[teamId] = [];
+    function getTeamIndex() {
+        if (offDefStatus === '1') return 'offense';
+        if (offDefStatus === '2') return 'defense';
+        if (team === '4') return 'ball';
+        return 'other';
+    }
+    const teamIndex = getTeamIndex();
+    if (!playerListByTeam[teamIndex]) playerListByTeam[teamIndex] = [];
 
-    playerListByTeam[teamId].push(
+    playerListByTeam[teamIndex].push(
         new Player(
             { name: playerId, team: teamId }, { center: new Point(x, y), occlusionRadius: 3 },
         ),
@@ -129,10 +144,18 @@ readInterface.on('line', line => {
 readInterface.on('close', () => {
     debug('Done', { length: graphByTime.length });
     // raw(json()(graphByTime));
+
+    const total = momentByTime.length;
     momentByTime.forEach((m: CourtMoment, i) => {
-        console.log('processing i', i);
-        const currentIsomorphisms: Array<{| moment: CourtMoment, currentPlayer: Player, count: number |}> = Object.values(libraryOfIsomorphisms);
-        const c = currentIsomorphisms.find(i => m.isIsomorphicTo(i.moment));
+        if (i % 100 === 0) {
+            debug('Matching Moment', { i, total });
+        }
+        const currentIsomorphisms: Array<{|
+            moment: CourtMoment,
+            currentPlayer: Player,
+            count: number,
+        |}> = Object.values(libraryOfIsomorphisms);
+        const c = currentIsomorphisms.find(iso => m.isIsomorphicTo(iso.moment));
 
         if (c) {
             libraryOfIsomorphisms[c.moment.time].count += 1;
@@ -141,12 +164,14 @@ readInterface.on('close', () => {
 
         libraryOfIsomorphisms[m.time] = {
             moment: m,
+            graph: graphByTime[i],
             currentPlayer: m.getPlayerWithBall(),
             count: 1,
         };
     });
 
-    console.log('libraryOfIsomorphisms', libraryOfIsomorphisms);
+    const vocab = Object.values(libraryOfIsomorphisms).sort((a, b) => b.count - a.count);
+    raw(json()(vocab));
 
     // raw(json()({
     //     label: 'duke-fs',

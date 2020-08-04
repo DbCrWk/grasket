@@ -5,7 +5,8 @@
     "language": "en",
     // words - list of words to be always considered correct
     "words": [
-        "pino",
-        "grasket"
+        "grasket",
+        "occlusivity",
+        "pino"
     ]
 }
