@@ -19,7 +19,7 @@ import listToLibrary from './listToLibrary';
 const error = errorGn('analyze:parseGame');
 const debug = debugGn('analyze:parseGame');
 
-const filePath = path.join(__dirname, '..', '..', 'data', 'Duke vs. FL State (1st half)-trunc.csv');
+const filePath = path.join(__dirname, '..', '..', 'data', 'Duke vs. FL State (1st half).csv');
 
 const readInterface = readline.createInterface({
     input: fs.createReadStream(filePath),
@@ -192,12 +192,20 @@ readInterface.on('close', () => {
     }
 
     debug('Done', { PossessionListLength: PossessionList.length });
+    PossessionList.forEach(p => {
+        p.moments.forEach(m => {
+            const { offense, defense } = m;
+            const points = [...offense.map(p => [p.center.x, p.center.y]), ...defense.map(p => [p.center.x, p.center.y])].reduce((a, b) => [...a, ...b]);
+            raw(points.join(','));
+        });
+    });
+
     // raw(json({ pretty: true })(PossessionList));
 
-    const net = listToNet(PossessionList);
+    // const net = listToNet(PossessionList);
     // // raw(json({ pretty: true })(net));
     // const occlusivity = netToOcclusivity(net);
-    const updatedList = listToPass(PossessionList);
+    // const updatedList = listToPass(PossessionList);
     // occlusivity.forEach((oo, possessionIndex) => {
     //     oo.forEach((o, momentIndex) => {
     //         const event = updatedList[possessionIndex].events.find(e => e.index === momentIndex);
@@ -223,74 +231,74 @@ readInterface.on('close', () => {
     // });
     // raw(json({ pretty: true })(updatedList));
 
-    const listWithLibrary = listToLibrary(net);
+    // const listWithLibrary = listToLibrary(net);
 
-    const hmmList: Array<{ rep: number, ent: number }> = [];
-    listWithLibrary.forEach((p, possessionIndex) => {
-        p.repList.forEach((r, momentIndex) => {
-            const event = updatedList[possessionIndex].events.find(e => e.index === momentIndex);
+    // const hmmList: Array<{ rep: number, ent: number }> = [];
+    // listWithLibrary.forEach((p, possessionIndex) => {
+    //     p.repList.forEach((r, momentIndex) => {
+    //         const event = updatedList[possessionIndex].events.find(e => e.index === momentIndex);
 
-            if (possessionIndex === 0) {
-                hmmList.push({ rep: r, ent: event ? 1 : 0 });
-                // console.log(`${r}\t${event ? 1 : 0}`);
-            }
-        });
-        // console.log('\n');
-    });
-    const hmmStates = [...(new Set(hmmList.map(l => l.rep)))];
-    const pi = (new Array(hmmStates.length)).fill(0);
-    hmmList.forEach(({ rep }) => {
-        const i = hmmStates.findIndex(r => r === rep);
-        pi[i] += 1;
-    });
-    const sumPi = pi.reduce((acc, x) => acc + x, 0);
-    const normalizedPi = pi.map(p => p / sumPi);
-    console.log('normalizedPi', normalizedPi);
+    //         if (possessionIndex === 0) {
+    //             hmmList.push({ rep: r, ent: event ? 1 : 0 });
+    //             // console.log(`${r}\t${event ? 1 : 0}`);
+    //         }
+    //     });
+    //     // console.log('\n');
+    // });
+    // const hmmStates = [...(new Set(hmmList.map(l => l.rep)))];
+    // const pi = (new Array(hmmStates.length)).fill(0);
+    // hmmList.forEach(({ rep }) => {
+    //     const i = hmmStates.findIndex(r => r === rep);
+    //     pi[i] += 1;
+    // });
+    // const sumPi = pi.reduce((acc, x) => acc + x, 0);
+    // const normalizedPi = pi.map(p => p / sumPi);
+    // console.log('normalizedPi', normalizedPi);
 
-    const Abase = (new Array(hmmStates.length)).fill(0);
-    const A = Abase.map(() => (new Array(hmmStates.length)).fill(0));
+    // const Abase = (new Array(hmmStates.length)).fill(0);
+    // const A = Abase.map(() => (new Array(hmmStates.length)).fill(0));
 
-    hmmList.reduce((prevRep, { rep }) => {
-        if (prevRep !== null) {
-            const i = hmmStates.findIndex(r => r === prevRep);
-            const j = hmmStates.findIndex(r => r === rep);
-            A[i][j] += 1;
-        }
-        return rep;
-    }, null);
-    A.forEach(aa => {
-        console.log(aa.join('\t'));
-    });
+    // hmmList.reduce((prevRep, { rep }) => {
+    //     if (prevRep !== null) {
+    //         const i = hmmStates.findIndex(r => r === prevRep);
+    //         const j = hmmStates.findIndex(r => r === rep);
+    //         A[i][j] += 1;
+    //     }
+    //     return rep;
+    // }, null);
+    // A.forEach(aa => {
+    //     console.log(aa.join('\t'));
+    // });
 
-    const Bbase = (new Array(hmmStates.length)).fill(0);
-    const B = Bbase.map(() => (new Array(2)).fill(0));
+    // const Bbase = (new Array(hmmStates.length)).fill(0);
+    // const B = Bbase.map(() => (new Array(2)).fill(0));
 
-    hmmList.forEach(({ rep, ent }) => {
-        const i = hmmStates.findIndex(r => r === rep);
-        B[i][ent] += 1;
-    });
-    B.forEach(aa => {
-        console.log(aa.join('\t'));
-    });
+    // hmmList.forEach(({ rep, ent }) => {
+    //     const i = hmmStates.findIndex(r => r === rep);
+    //     B[i][ent] += 1;
+    // });
+    // B.forEach(aa => {
+    //     console.log(aa.join('\t'));
+    // });
 
     // jmm processing
-    const jmmMap = {};
+    // const jmmMap = {};
 
-    hmmList.reduce((prevRep, { rep }) => {
-        if (!jmmMap[rep]) {
-            jmmMap[rep] = [0];
-        }
+    // hmmList.reduce((prevRep, { rep }) => {
+    //     if (!jmmMap[rep]) {
+    //         jmmMap[rep] = [0];
+    //     }
 
-        if (prevRep !== null) {
-            jmmMap[prevRep][jmmMap[prevRep].length - 1] += 1;
-            if (prevRep !== rep) {
-                jmmMap[prevRep].push(0);
-            }
-        }
-        return rep;
-    }, null);
+    //     if (prevRep !== null) {
+    //         jmmMap[prevRep][jmmMap[prevRep].length - 1] += 1;
+    //         if (prevRep !== rep) {
+    //             jmmMap[prevRep].push(0);
+    //         }
+    //     }
+    //     return rep;
+    // }, null);
 
-    console.log('jmmMap', jmmMap);
+    // console.log('jmmMap', jmmMap);
 
     // raw(json({ pretty: true })(listWithLibrary));
 });
