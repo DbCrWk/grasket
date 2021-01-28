@@ -54,7 +54,7 @@
         "better-ajv-errors": "0.6.7",
         "cspell": "4.0.63",
         "dotenv-cli": "3.1.0",
-        "electron": "9.1.0",
+        "electron": "9.4.0",
         "eslint": "7.4.0",
         "eslint-config-airbnb-base": "14.2.0",
         "eslint-plugin-flowtype": "5.1.0",
